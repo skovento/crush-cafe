@@ -6,23 +6,32 @@ import { business, facts, media } from "../data/business";
 export default function Hero() {
   const ref = useRef(null);
   const videoRef = useRef(null);
-  const [hasVideo, setHasVideo] = useState(false);
+  const [hasVideo, setHasVideo] = useState(true);
 
-  // Ambient night loop behind the headline, once footage exists. Until then
-  // the gradient below carries the section on its own.
+  // Ambient night loop behind the headline. Enabled by default with auto-play & touch priming.
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
-    const ok = () => setHasVideo(true);
-    const fail = () => setHasVideo(false);
-    if (v.readyState >= 2) ok();
-    else {
-      v.addEventListener("loadeddata", ok, { once: true });
-      v.addEventListener("error", fail, { once: true });
-    }
+    setHasVideo(true);
+
+    const playVideo = () => {
+      if (v.paused) {
+        v.play().catch(() => {});
+      }
+    };
+
+    playVideo();
+
+    const onFail = () => setHasVideo(false);
+    v.addEventListener("error", onFail, { once: true });
+
+    window.addEventListener("pointerdown", playVideo, { once: true });
+    window.addEventListener("touchstart", playVideo, { once: true });
+
     return () => {
-      v.removeEventListener("loadeddata", ok);
-      v.removeEventListener("error", fail);
+      v.removeEventListener("error", onFail);
+      window.removeEventListener("pointerdown", playVideo);
+      window.removeEventListener("touchstart", playVideo);
     };
   }, []);
 
@@ -54,9 +63,10 @@ export default function Hero() {
       ref={ref}
       className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden section-pad pt-28 pb-16"
     >
-      {/* Ambient night footage, when it exists. */}
+      {/* Ambient night footage — rendered directly with autoplay & touch priming */}
       <video
         ref={videoRef}
+        src={media.heroVideo}
         autoPlay
         muted
         loop
@@ -70,8 +80,7 @@ export default function Hero() {
         <source src={media.heroVideo} type="video/mp4" />
       </video>
 
-      {/* Scrims sit over the footage; they also carry the section on their
-          own while the footage is still missing. */}
+      {/* Scrims sit over the footage */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-night via-night/85 to-night/40" />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 bg-[radial-gradient(ellipse_at_50%_100%,rgba(255,122,77,0.30),transparent_65%)]" />
       <div className="pointer-events-none absolute -left-40 top-10 h-[26rem] w-[26rem] rounded-full bg-surf/15 blur-[130px]" />

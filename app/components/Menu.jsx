@@ -53,7 +53,7 @@ export default function Menu() {
 
       {/* Visible placeholder notice — the client should see exactly what is
           and isn't real in this demo. */}
-      <div className="mb-8 sm:mb-10 flex items-start gap-3 rounded-2xl border border-amber/35 bg-amber/[0.07] p-4 sm:p-5">
+      <div className="mb-8 sm:mb-10 flex items-start flex-col sm:flex-row gap-3 rounded-2xl border border-amber/35 bg-amber/[0.07] p-4 sm:p-5">
         <span className="mt-0.5 shrink-0 rounded-full bg-amber px-2.5 py-0.5 text-xs font-bold text-night">
           PLACEHOLDER
         </span>

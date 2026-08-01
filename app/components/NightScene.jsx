@@ -141,7 +141,7 @@ export default function NightScene() {
   return (
     <section
       ref={sectionRef}
-      className="relative h-screen overflow-hidden"
+      className="relative h-[100svh] min-h-[100svh] overflow-hidden"
       style={{ perspective: "1100px", perspectiveOrigin: "50% 42%" }}
     >
       <div

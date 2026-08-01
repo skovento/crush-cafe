@@ -122,7 +122,7 @@ export default function VibeBand() {
   }
 
   return (
-    <section ref={sectionRef} className="relative h-screen overflow-hidden bg-night">
+    <section ref={sectionRef} className="relative h-[100svh] min-h-[100svh] overflow-hidden bg-night">
       {/* Subtle depth wash behind the track. */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,rgba(245,146,30,0.10),transparent_60%)]" />
 

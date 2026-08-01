@@ -5,10 +5,15 @@ import { gsap, ScrollTrigger } from "../lib/gsap";
 
 export default function SmoothScrollProvider({ children }) {
   useEffect(() => {
+    ScrollTrigger.config({ ignoreMobileResize: true });
+
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+
     const lenis = new Lenis({
-      duration: 1.15,
+      duration: isMobile ? 0.9 : 1.15,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
+      syncTouch: true,
     });
 
     lenis.on("scroll", ScrollTrigger.update);
@@ -17,14 +22,10 @@ export default function SmoothScrollProvider({ children }) {
     gsap.ticker.add(raf);
     gsap.ticker.lagSmoothing(0);
 
-    // Pinned sections change document height after other triggers have
-    // measured the page; without a refresh those triggers never fire.
     const refresh = () => ScrollTrigger.refresh();
-    const t = setTimeout(refresh, 400);
+    const t = setTimeout(refresh, 300);
     window.addEventListener("load", refresh);
 
-    // window.scrollTo() bypasses Lenis and won't update ScrollTrigger.
-    // Use window.__lenis.scrollTo(y) when debugging scrub effects.
     if (process.env.NODE_ENV !== "production") window.__lenis = lenis;
 
     return () => {
