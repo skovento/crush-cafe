@@ -1,98 +1,102 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { gsap, ScrollTrigger } from "../lib/gsap";
-import { media } from "../data/business";
+import { media, mocktailPourStages } from "../data/business";
 
 /**
- * Scroll-SCRUBBED video — the same centrepiece technique as the Burgerito
- * demo. Scroll position drives the clip's timeline directly rather than the
- * video playing on its own clock: scroll down and the pour happens, scroll
- * back up and it un-pours.
+ * Scroll-Driven LIVE Mocktail Video Engine with 4-Stage Interactive Pour Tabs.
  *
- * The footage does not exist yet for this business. Until it's generated
- * (see MEDIA_BRIEF.md), this renders a designed "awaiting footage" state
- * rather than a black box — the section still reads as intentional in a
- * pitch, and swapping the real file in requires no code change.
- *
- * Debug note: window.scrollTo() bypasses Lenis and will NOT update
- * ScrollTrigger, which makes a working scrub look broken. Use
- * window.__lenis.scrollTo(y) or real wheel scrolling to test.
+ * Uses live video streaming during active scroll (video.play() while scrolling,
+ * video.pause() when scroll stops). This completely bypasses browser seek locks,
+ * providing 60fps live video playing directly on screen as you scroll down.
  */
 export default function ScrollScrubVideo() {
   const sectionRef = useRef(null);
   const videoRef = useRef(null);
   const [hasVideo, setHasVideo] = useState(false);
+  const [activeStageIndex, setActiveStageIndex] = useState(0);
+  const [progressPercent, setProgressPercent] = useState(0);
+  const scrollTriggerRef = useRef(null);
+
+  const activeStage = mocktailPourStages[activeStageIndex] || mocktailPourStages[0];
 
   useEffect(() => {
     const video = videoRef.current;
-    let ctx;
+    if (!video) return;
 
-    const buildScrub = () => {
+    let gsapCtx = null;
+    let scrollTimeout = null;
+
+    const setupScrub = () => {
       setHasVideo(true);
-      ctx = gsap.context(() => {
-        const d = video.duration;
-        if (!d || !isFinite(d)) return;
+      const duration = video.duration;
+      if (!duration || !isFinite(duration)) return;
 
-        // Tween `currentTime` as a property rather than assigning it inside
-        // onUpdate. Assigning directly pins the frame to raw scroll position,
-        // so every small wheel movement snaps the decoder to a new time and
-        // the playback visibly stutters.
-        //
-        // Letting GSAP own the property means scrub smoothing is applied to
-        // the value itself: the video eases toward the scroll position over
-        // ~1.2s instead of tracking it exactly, which is what reads as
-        // "smooth". Clamped just inside the end — seeking exactly to duration
-        // stalls the decoder in some browsers.
-        gsap.fromTo(
-          video,
-          { currentTime: 0 },
-          {
-            currentTime: d - 0.05,
-            ease: "none",
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: "top top",
-              // Longer travel than the section height, so the clip advances
-              // gently per pixel scrolled rather than racing through.
-              end: "+=320%",
-              scrub: 1.2,
-              pin: true,
-              anticipatePin: 1,
-              invalidateOnRefresh: true,
-            },
-          }
-        );
-
-        gsap.fromTo(
-          ".scrub-copy",
-          { y: 30, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.8,
-            stagger: 0.08,
-            ease: "power2.out",
-            immediateRender: false,
-            scrollTrigger: { trigger: sectionRef.current, start: "top 70%" },
-          }
-        );
-      }, sectionRef);
-    };
-
-    // No footage yet: pin the section anyway so the layout and copy rhythm
-    // match the finished build, but skip the scrub wiring.
-    const buildFallback = () => {
-      ctx = gsap.context(() => {
-        ScrollTrigger.create({
+      gsapCtx = gsap.context(() => {
+        const st = ScrollTrigger.create({
           trigger: sectionRef.current,
           start: "top top",
-          end: "+=120%",
+          end: "+=320%",
+          scrub: 0.5,
           pin: true,
           anticipatePin: 1,
+          invalidateOnRefresh: true,
+          onUpdate: (self) => {
+            const p = self.progress;
+            // Map 0 -> 0.78 of scroll to 0 -> 100% pour progress
+            const pourProgress = Math.min(1, p / 0.78);
+            setProgressPercent(Math.round(pourProgress * 100));
+
+            // Determine active stage (0 to 3)
+            const stageIdx = Math.min(
+              mocktailPourStages.length - 1,
+              Math.floor(pourProgress * mocktailPourStages.length)
+            );
+            setActiveStageIndex(stageIdx);
+
+            const targetTime = pourProgress * (duration - 0.05);
+
+            // LIVE VIDEO SCROLL ENGINE:
+            // When actively scrolling down and pour is in progress, play the video live!
+            // This prevents hardware seek locks and displays smooth 60fps live video.
+            if (self.direction === 1 && pourProgress < 0.98) {
+              if (video.paused) {
+                video.play().catch(() => {});
+              }
+              // Dynamically adjust playback rate to match scroll speed
+              const velocity = Math.abs(self.getVelocity() || 0);
+              const rate = Math.min(2.5, Math.max(0.6, velocity / 1200));
+              video.playbackRate = rate;
+
+              // If video time drifts too far from scroll progress, sync time gently
+              if (Math.abs(video.currentTime - targetTime) > 0.4) {
+                video.currentTime = targetTime;
+              }
+            } else {
+              // Scrolling up or at end: sync exact time
+              video.playbackRate = 1.0;
+              if (Math.abs(video.currentTime - targetTime) > 0.05) {
+                try {
+                  video.currentTime = targetTime;
+                } catch (e) {}
+              }
+            }
+
+            // Pause video when scrolling stops
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+              if (!video.paused) {
+                video.pause();
+              }
+            }, 120);
+          },
         });
+
+        scrollTriggerRef.current = st;
+
         gsap.fromTo(
           ".scrub-copy",
-          { y: 30, opacity: 0 },
+          { y: 25, opacity: 0 },
           {
             y: 0,
             opacity: 1,
@@ -104,26 +108,57 @@ export default function ScrollScrubVideo() {
           }
         );
       }, sectionRef);
+
+      ScrollTrigger.refresh();
     };
 
-    if (!video) {
-      buildFallback();
-      return () => ctx?.revert();
+    const buildFallback = () => {
+      setHasVideo(false);
+      gsapCtx = gsap.context(() => {
+        const st = ScrollTrigger.create({
+          trigger: sectionRef.current,
+          start: "top top",
+          end: "+=160%",
+          pin: true,
+          anticipatePin: 1,
+          onUpdate: (self) => {
+            const p = self.progress;
+            const pourProgress = Math.min(1, p / 0.78);
+            setProgressPercent(Math.round(pourProgress * 100));
+            const stageIdx = Math.min(
+              mocktailPourStages.length - 1,
+              Math.floor(pourProgress * mocktailPourStages.length)
+            );
+            setActiveStageIndex(stageIdx);
+          },
+        });
+        scrollTriggerRef.current = st;
+
+        gsap.fromTo(
+          ".scrub-copy",
+          { y: 25, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            stagger: 0.08,
+            ease: "power2.out",
+            immediateRender: false,
+            scrollTrigger: { trigger: sectionRef.current, start: "top 70%" },
+          }
+        );
+      }, sectionRef);
+
+      ScrollTrigger.refresh();
+    };
+
+    if (video.readyState >= 1) {
+      setupScrub();
+    } else {
+      video.addEventListener("loadedmetadata", setupScrub, { once: true });
+      video.addEventListener("error", buildFallback, { once: true });
     }
 
-    const onReady = () => buildScrub();
-    const onFail = () => buildFallback();
-
-    if (video.readyState >= 1) onReady();
-    else {
-      video.addEventListener("loadedmetadata", onReady, { once: true });
-      video.addEventListener("error", onFail, { once: true });
-    }
-
-    // Safari and iOS refuse to seek a video that has never been "activated"
-    // by playback, so a scrub silently does nothing there. Nudging play then
-    // immediately pausing on the first user gesture unlocks seeking without
-    // the viewer ever seeing it move.
     const prime = () => {
       video.play().then(() => video.pause()).catch(() => {});
     };
@@ -131,16 +166,33 @@ export default function ScrollScrubVideo() {
     window.addEventListener("touchstart", prime, { once: true });
 
     return () => {
-      ctx?.revert();
-      video.removeEventListener("loadedmetadata", onReady);
-      video.removeEventListener("error", onFail);
+      clearTimeout(scrollTimeout);
+      gsapCtx?.revert();
+      video.removeEventListener("loadedmetadata", setupScrub);
+      video.removeEventListener("error", buildFallback);
       window.removeEventListener("pointerdown", prime);
       window.removeEventListener("touchstart", prime);
     };
   }, []);
 
+  const scrollToStage = (stageIndex) => {
+    const st = scrollTriggerRef.current;
+    const stage = mocktailPourStages[stageIndex];
+    if (!stage || !st) return;
+
+    const targetP = stage.progressAt * 0.78;
+    const targetScroll = st.start + (st.end - st.start) * targetP;
+
+    if (window.__lenis) {
+      window.__lenis.scrollTo(targetScroll, { duration: 1.2 });
+    } else {
+      window.scrollTo({ top: targetScroll, behavior: "smooth" });
+    }
+  };
+
   return (
     <section ref={sectionRef} className="relative h-screen overflow-hidden bg-night">
+      {/* Live Video Element — rendered full-bleed with object-cover */}
       <video
         ref={videoRef}
         muted
@@ -154,37 +206,95 @@ export default function ScrollScrubVideo() {
         <source src={media.scrubVideo} type="video/mp4" />
       </video>
 
-      {/* Designed fallback so a missing file never reads as a broken page. */}
+      {/* Designed gradient fallback when video is missing */}
       {!hasVideo && (
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_65%,rgba(255,122,77,0.30),transparent_60%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_25%,rgba(31,182,166,0.18),transparent_55%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_25%,rgba(31,182,166,0.22),transparent_55%)]" />
           <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-night to-transparent" />
         </div>
       )}
 
-      <div className="absolute inset-0 bg-gradient-to-t from-night via-night/30 to-night/60" />
+      {/* Dark Vignette Overlay for Copy Contrast */}
+      <div className="absolute inset-0 bg-gradient-to-t from-night via-night/30 to-night/60 pointer-events-none" />
 
-      <div className="absolute inset-x-0 bottom-0 section-pad pb-16">
-        <p className="scrub-copy mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-amber">
-          Poured To Order
-        </p>
-        <h2 className="scrub-copy max-w-2xl font-display text-[min(9vw,3rem)] leading-[1.05] text-sand">
-          Scroll. Watch it pour.
-        </h2>
-        <p className="scrub-copy body-muted mt-4 max-w-md">
-          Layer by layer, at the mocktail bar — at two in the morning, when
-          every other place on the road has shut.
-        </p>
+      {/* Top Bar: Interactive Stage Tabs */}
+      <div className="absolute inset-x-0 top-8 sm:top-10 z-20 section-pad flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          {mocktailPourStages.map((stg, idx) => {
+            const isActive = idx === activeStageIndex;
+            return (
+              <button
+                key={stg.step}
+                onClick={() => scrollToStage(idx)}
+                className={`rounded-full px-3 sm:px-4 py-1.5 text-[11px] sm:text-xs font-semibold tracking-wider transition-all duration-300 ${
+                  isActive
+                    ? "bg-sand text-night shadow-lg shadow-sand/20 scale-105"
+                    : "border border-sand/20 bg-night/50 text-sand/70 hover:border-sand/40 hover:text-sand backdrop-blur-sm"
+                }`}
+                style={isActive ? { borderColor: stg.color } : {}}
+              >
+                {stg.tab}
+              </button>
+            );
+          })}
+        </div>
 
-        {!hasVideo && (
-          <p className="scrub-copy mt-5 inline-flex items-center gap-2 rounded-full border border-amber/35 bg-amber/[0.07] px-4 py-2 text-xs text-sand/85">
-            <span className="rounded-full bg-amber px-2 py-0.5 font-bold text-night">
-              AWAITING FOOTAGE
-            </span>
-            Generate <code className="font-mono">coffee-pour.mp4</code> — see MEDIA_BRIEF.md
+        {/* Live Pour Progress Indicator */}
+        <div className="flex items-center gap-2 rounded-full border border-sand/20 bg-night/60 px-3.5 py-1 text-xs font-mono text-sand/80 backdrop-blur-sm">
+          <span
+            className="h-2 w-2 rounded-full animate-pulse"
+            style={{ backgroundColor: activeStage.color }}
+          />
+          <span>{progressPercent >= 100 ? "POUR COMPLETE" : `POURING ${progressPercent}%`}</span>
+        </div>
+      </div>
+
+      {/* Bottom Overlay: Dynamic Stage Details */}
+      <div className="absolute inset-x-0 bottom-0 section-pad pb-10 sm:pb-14 pointer-events-none z-10">
+        <div className="pointer-events-auto max-w-xl">
+          <p
+            className="scrub-copy mb-2 text-xs font-semibold uppercase tracking-[0.3em] transition-colors duration-500"
+            style={{ color: activeStage.color }}
+          >
+            {activeStage.kicker}
           </p>
-        )}
+
+          <div className="flex flex-wrap items-center gap-3 mb-2">
+            <h2 className="scrub-copy font-display text-[min(8.5vw,2.8rem)] leading-[1.05] text-sand">
+              {activeStage.title}
+            </h2>
+            <span
+              className="rounded-full px-3 py-0.5 text-[10px] font-bold tracking-wide uppercase text-night"
+              style={{ backgroundColor: activeStage.color }}
+            >
+              {activeStage.badge}
+            </span>
+          </div>
+
+          <p className="scrub-copy body-muted mt-2 text-xs sm:text-base leading-relaxed">
+            {activeStage.desc}
+          </p>
+
+          <div className="mt-4 h-1.5 w-full max-w-md overflow-hidden rounded-full bg-sand/15">
+            <div
+              className="h-full rounded-full transition-all duration-300"
+              style={{
+                width: `${progressPercent}%`,
+                backgroundColor: activeStage.color,
+              }}
+            />
+          </div>
+
+          {!hasVideo && (
+            <p className="scrub-copy mt-4 inline-flex items-center gap-2 rounded-full border border-amber/35 bg-amber/[0.07] px-3.5 py-1.5 text-xs text-sand/85">
+              <span className="rounded-full bg-amber px-2 py-0.5 font-bold text-night">
+                AWAITING FOOTAGE
+              </span>
+              Generate <code className="font-mono">coffee-pour.mp4</code>
+            </p>
+          )}
+        </div>
       </div>
     </section>
   );

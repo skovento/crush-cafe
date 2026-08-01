@@ -264,20 +264,20 @@ export default function NightScene() {
       </div>
 
       {/* Foreground copy — sits above the 3D stage */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex flex-col items-center pt-24">
-        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.35em] text-sand/70">
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex flex-col items-center pt-10 sm:pt-12 px-4 text-center">
+        <p className="mb-2 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.35em] text-sand/70">
           Netaji Road · Ahmedabad
         </p>
-        <p className="neon-sign font-display text-[min(11vw,4rem)] leading-none text-sunset neon">
+        <p className="neon-sign font-display text-[min(10vw,4rem)] leading-none text-sunset neon">
           OPEN TILL 2 AM
         </p>
       </div>
 
-      <div className="absolute inset-x-0 bottom-0 z-20 bg-night/80 pb-10 pt-5 section-pad backdrop-blur-sm">
-        <p className="mx-auto h-6 max-w-xl text-center text-sm text-sand sm:text-base">
+      <div className="absolute inset-x-0 bottom-0 z-20 bg-night/85 pb-8 sm:pb-10 pt-4 sm:pt-5 section-pad backdrop-blur-sm">
+        <p className="mx-auto min-h-[2.5rem] max-w-xl text-center text-xs sm:text-base text-sand flex items-center justify-center">
           {sceneCaptions[caption]}
         </p>
-        <div className="mx-auto mt-4 h-1.5 w-full max-w-sm overflow-hidden rounded-full bg-sand/15">
+        <div className="mx-auto mt-2 sm:mt-4 h-1.5 w-full max-w-sm overflow-hidden rounded-full bg-sand/15">
           <div className="scene-progress h-full origin-left scale-x-0 rounded-full bg-sunset" />
         </div>
       </div>

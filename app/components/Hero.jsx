@@ -94,30 +94,30 @@ export default function Hero() {
         </span>
       </h1>
 
-      <p className="hero-sub body-muted relative z-10 mt-8 max-w-xl text-lg leading-relaxed">
+      <p className="hero-sub body-muted relative z-10 mt-6 sm:mt-8 max-w-xl text-base sm:text-lg leading-relaxed">
         {business.intro}
       </p>
 
-      <div className="hero-sub relative z-10 mt-9 flex flex-wrap gap-4">
+      <div className="hero-sub relative z-10 mt-6 sm:mt-9 flex flex-wrap gap-3 sm:gap-4">
         <a
           href={business.phone.href}
-          className="rounded-full bg-sunset px-7 py-3.5 font-semibold text-night transition-transform hover:scale-105"
+          className="rounded-full bg-sunset px-6 sm:px-7 py-3 sm:py-3.5 text-sm sm:text-base font-semibold text-night transition-transform hover:scale-105"
         >
           Call · {business.phone.display}
         </a>
         <a
           href="#visit"
-          className="rounded-full border border-sand/35 px-7 py-3.5 font-semibold text-sand transition-colors hover:border-amber hover:text-amber"
+          className="rounded-full border border-sand/35 px-6 sm:px-7 py-3 sm:py-3.5 text-sm sm:text-base font-semibold text-sand transition-colors hover:border-amber hover:text-amber"
         >
           Find Us
         </a>
       </div>
 
-      <dl className="hero-sub relative z-10 mt-14 grid grid-cols-2 gap-5 sm:grid-cols-4">
+      <dl className="hero-sub relative z-10 mt-10 sm:mt-14 grid grid-cols-2 gap-3 sm:gap-5 sm:grid-cols-4">
         {facts.map((f) => (
-          <div key={f.label} className="rounded-2xl border border-sand/12 bg-sand/[0.04] p-5">
-            <dt className="font-display text-2xl text-amber">{f.value}</dt>
-            <dd className="mt-1.5 text-sm text-sand/70">{f.label}</dd>
+          <div key={f.label} className="rounded-2xl border border-sand/12 bg-sand/[0.04] p-3.5 sm:p-5">
+            <dt className="font-display text-xl sm:text-2xl text-amber">{f.value}</dt>
+            <dd className="mt-1 text-xs sm:text-sm text-sand/70">{f.label}</dd>
           </div>
         ))}
       </dl>

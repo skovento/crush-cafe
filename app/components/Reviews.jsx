@@ -11,11 +11,11 @@ export default function Reviews() {
   ]);
 
   return (
-    <section ref={ref} className="section-pad bg-dusk py-28">
+    <section ref={ref} className="section-pad bg-dusk py-20 sm:py-28">
       <p className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-amber">
         {business.rating.score} Stars · Every Single Review
       </p>
-      <h2 className="mb-14 max-w-2xl font-display text-[min(9vw,3rem)] leading-tight text-sand">
+      <h2 className="mb-10 sm:mb-14 max-w-2xl font-display text-[min(9vw,3rem)] leading-tight text-sand">
         Twenty reviews. Not one below five.
       </h2>
 
@@ -23,7 +23,7 @@ export default function Reviews() {
         {reviews.map((r) => (
           <figure
             key={r.name}
-            className="rev rounded-2xl border border-sand/12 bg-sand/[0.05] p-7"
+            className="rev rounded-2xl border border-sand/12 bg-sand/[0.05] p-5 sm:p-7"
           >
             <p className="mb-4 text-amber" aria-label="5 out of 5 stars">
               ★★★★★

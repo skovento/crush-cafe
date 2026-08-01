@@ -126,11 +126,11 @@ export default function VibeBand() {
       {/* Subtle depth wash behind the track. */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,rgba(245,146,30,0.10),transparent_60%)]" />
 
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-20 section-pad pt-24">
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-amber">
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-20 section-pad pt-8 sm:pt-10">
+        <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.3em] text-amber">
           After Dark
         </p>
-        <h2 className="mt-2 max-w-xl font-display text-[min(6vw,2rem)] leading-tight text-sand">
+        <h2 className="mt-1 sm:mt-2 max-w-xl font-display text-[min(6vw,2rem)] leading-tight text-sand">
           Law Garden&apos;s still awake. So are we.
         </h2>
       </div>
@@ -147,11 +147,11 @@ export default function VibeBand() {
           {gallery.map((g) => (
             <div
               key={g.src}
-              className="hpanel flex h-full w-screen shrink-0 items-center justify-center px-[6vw]"
+              className="hpanel flex h-full w-screen shrink-0 items-center justify-center px-[4vw] sm:px-[6vw]"
               style={{ transformStyle: "preserve-3d" }}
             >
               <figure
-                className="hcard relative h-[62vh] w-full max-w-5xl overflow-hidden rounded-[2rem] shadow-2xl shadow-black/70 ring-1 ring-sand/15"
+                className="hcard relative h-[65vh] sm:h-[62vh] w-full max-w-5xl overflow-hidden rounded-2xl sm:rounded-[2rem] shadow-2xl shadow-black/70 ring-1 ring-sand/15"
                 style={{ transformStyle: "preserve-3d" }}
               >
                 <Image
@@ -164,23 +164,23 @@ export default function VibeBand() {
                 />
                 {/* glossy sheen, per the reference look */}
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-sand/[0.06] to-sand/[0.14]" />
-                <div className="absolute inset-0 bg-gradient-to-t from-night via-night/25 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-night via-night/35 to-transparent" />
 
-                <figcaption className="hdetail absolute inset-x-0 bottom-0 p-8 sm:p-10">
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-[0.3em] text-amber">
+                <figcaption className="hdetail absolute inset-x-0 bottom-0 p-5 sm:p-10">
+                  <p className="mb-1.5 sm:mb-2 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.3em] text-amber">
                     {g.kicker}
                   </p>
-                  <h3 className="max-w-2xl font-display text-[min(5vw,2rem)] leading-tight text-sand">
+                  <h3 className="max-w-2xl font-display text-[min(6vw,2rem)] leading-tight text-sand">
                     {g.title}
                   </h3>
-                  <p className="mt-3 max-w-lg text-sm leading-relaxed text-sand/85 sm:text-base">
+                  <p className="mt-2 sm:mt-3 max-w-lg text-xs sm:text-base leading-relaxed text-sand/85">
                     {g.body}
                   </p>
-                  <div className="mt-5 flex flex-wrap gap-2">
+                  <div className="mt-3 sm:mt-5 flex flex-wrap gap-1.5 sm:gap-2">
                     {g.tags.map((t) => (
                       <span
                         key={t}
-                        className="rounded-full border border-sand/25 bg-night/40 px-3.5 py-1.5 text-xs text-sand/85 backdrop-blur-sm"
+                        className="rounded-full border border-sand/25 bg-night/40 px-2.5 sm:px-3.5 py-1 sm:py-1.5 text-[11px] sm:text-xs text-sand/85 backdrop-blur-sm"
                       >
                         {t}
                       </span>

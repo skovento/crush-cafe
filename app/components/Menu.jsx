@@ -15,21 +15,21 @@ export default function Menu() {
   ]);
 
   return (
-    <section id="menu" ref={ref} className="section-pad bg-night py-28">
+    <section id="menu" ref={ref} className="section-pad bg-night py-20 sm:py-28">
       <p className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-amber">
         On The Counter
       </p>
       <h2 className="mb-4 max-w-2xl font-display text-[min(9vw,3rem)] leading-tight text-sand">
         Mocktails, and nothing over ₹200
       </h2>
-      <p className="body-muted mb-12 max-w-xl">
+      <p className="body-muted mb-8 sm:mb-12 max-w-xl text-sm sm:text-base">
         {business.priceBand} — which, two minutes from the GLS College gate, is
         rather the point.
       </p>
 
       {/* Real photography sits above the placeholder menu, so the section
           leads with something finished rather than with a caveat. */}
-      <div className="mb-12 grid grid-cols-1 gap-5 sm:grid-cols-2">
+      <div className="mb-10 sm:mb-12 grid grid-cols-1 gap-5 sm:grid-cols-2">
         {dishes.map((d) => (
           <figure
             key={d.src}
@@ -43,9 +43,9 @@ export default function Menu() {
               sizes="(max-width: 640px) 100vw, 50vw"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-night via-night/20 to-transparent" />
-            <figcaption className="absolute inset-x-0 bottom-0 p-6">
-              <h3 className="font-display text-xl text-sand">{d.name}</h3>
-              <p className="mt-1 text-sm text-sand/75">{d.note}</p>
+            <figcaption className="absolute inset-x-0 bottom-0 p-4 sm:p-6">
+              <h3 className="font-display text-lg sm:text-xl text-sand">{d.name}</h3>
+              <p className="mt-1 text-xs sm:text-sm text-sand/75">{d.note}</p>
             </figcaption>
           </figure>
         ))}
@@ -53,18 +53,18 @@ export default function Menu() {
 
       {/* Visible placeholder notice — the client should see exactly what is
           and isn't real in this demo. */}
-      <div className="mb-10 flex items-start gap-3 rounded-2xl border border-amber/35 bg-amber/[0.07] p-5">
+      <div className="mb-8 sm:mb-10 flex items-start gap-3 rounded-2xl border border-amber/35 bg-amber/[0.07] p-4 sm:p-5">
         <span className="mt-0.5 shrink-0 rounded-full bg-amber px-2.5 py-0.5 text-xs font-bold text-night">
           PLACEHOLDER
         </span>
-        <p className="text-sm leading-relaxed text-sand/85">{menuPlaceholder.note}</p>
+        <p className="text-xs sm:text-sm leading-relaxed text-sand/85">{menuPlaceholder.note}</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {menuPlaceholder.categories.map((c) => (
           <div
             key={c.title}
-            className={`menu-col rounded-2xl p-6 ${
+            className={`menu-col rounded-2xl p-4 sm:p-6 ${
               c.verified
                 ? "border border-sunset/50 bg-sunset/[0.07]"
                 : "border border-dashed border-sand/25 bg-sand/[0.03]"

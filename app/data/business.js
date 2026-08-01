@@ -183,3 +183,46 @@ export const sceneCaptions = [
   "Midnight — still going",
   "2 AM — last cup, and nowhere else is open",
 ];
+
+export const mocktailPourStages = [
+  {
+    step: "01",
+    tab: "01 BASE",
+    kicker: "STEP 01 · THE BASE",
+    title: "Turquoise Blue Base",
+    desc: "Chilled clear glass filled with ice. Bright turquoise-blue syrup pours first into the base.",
+    color: "#12B5C9",
+    badge: "TURQUOISE SYRUP",
+    progressAt: 0.12,
+  },
+  {
+    step: "02",
+    tab: "02 LAYER",
+    kicker: "STEP 02 · THE DENSITY",
+    title: "Vivid Sunset Orange",
+    desc: "Vivid orange syrup layers over the turquoise base, forming a vibrant dual-tone gradient.",
+    color: "#FF7A4D",
+    badge: "ORANGE LAYER",
+    progressAt: 0.37,
+  },
+  {
+    step: "03",
+    tab: "03 FIZZ",
+    kicker: "STEP 03 · THE FIZZ",
+    title: "Sparkling Soda Rise",
+    desc: "A splash of crisp soda rises through the ice, mingling the saturated colors with effervescent bubbles.",
+    color: "#F5921E",
+    badge: "SPARKLING SODA",
+    progressAt: 0.62,
+  },
+  {
+    step: "04",
+    tab: "04 FINISH",
+    kicker: "STEP 04 · THE FINISH",
+    title: "Lemon & Mint Finish",
+    desc: "A juicy lemon wedge and fresh aromatic mint sprig land on top. Poured to order at two in the morning.",
+    color: "#38BDF8",
+    badge: "MINT & CITRUS",
+    progressAt: 0.88,
+  },
+];

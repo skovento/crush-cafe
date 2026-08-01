@@ -1,25 +1,14 @@
 "use client";
-import { useEffect, useState } from "react";
 import { business } from "../data/business";
 
+/**
+ * Header navigation — positioned absolutely at top: 0 of the Hero section.
+ * Only visible when at the top of the page; scrolls away so all subsequent
+ * sections (NightScene, Poured To Order video, VibeBand) have full viewport real estate.
+ */
 export default function Nav() {
-  const [solid, setSolid] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setSolid(window.scrollY > 80);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
   return (
-    <header
-      className={`fixed inset-x-0 top-0 z-50 flex items-center justify-between section-pad transition-all duration-300 ${
-        solid
-          ? "bg-night/95 py-3 shadow-lg shadow-black/40 backdrop-blur-md"
-          : "bg-gradient-to-b from-night/80 to-transparent py-5"
-      }`}
-    >
+    <header className="absolute inset-x-0 top-0 z-50 flex items-center justify-between section-pad py-5 bg-gradient-to-b from-night/80 to-transparent">
       {/* Green + orange split echoes the "The Royal" lettering painted on
           their actual bar counter. */}
       <a href="#" className="font-display text-base tracking-tight sm:text-lg">
