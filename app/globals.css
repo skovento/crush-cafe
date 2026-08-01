@@ -34,3 +34,18 @@ html, body {
     0 0 14px rgba(18, 181, 201, 0.55),
     0 0 44px rgba(18, 181, 201, 0.28);
 }
+
+/* The pour-stage tab strip scrolls horizontally on narrow screens. Without
+   this the browser paints a real scrollbar under it, which reads as a stray
+   line appearing whenever the active stage changes. Referenced as
+   `no-scrollbar` in ScrollScrubVideo — it must be defined here or the class
+   silently does nothing. */
+.no-scrollbar {
+  -ms-overflow-style: none;   /* IE / old Edge */
+  scrollbar-width: none;      /* Firefox */
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;              /* Chrome, Safari, new Edge */
+  width: 0;
+  height: 0;
+}
