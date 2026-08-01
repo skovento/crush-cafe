@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body {
+  background-color: #0D0D10;
+  color: #FBF7EC;
+  overscroll-behavior: none;
+}
+
+::selection { background: #F5921E; color: #0D0D10; }
+
+.section-pad {
+  padding-left: clamp(1.25rem, 6vw, 6rem);
+  padding-right: clamp(1.25rem, 6vw, 6rem);
+}
+
+/* Secondary copy stays legible against the dark room. */
+.body-muted { color: rgba(251, 247, 236, 0.80); }
+
+/* Backlit-sign glow, echoing the MOCKTAIL panel above their bar. */
+.neon {
+  text-shadow:
+    0 0 14px rgba(245, 146, 30, 0.55),
+    0 0 44px rgba(245, 146, 30, 0.28);
+}
+
+.neon-cool {
+  text-shadow:
+    0 0 14px rgba(18, 181, 201, 0.55),
+    0 0 44px rgba(18, 181, 201, 0.28);
+}
